@@ -2,7 +2,9 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -26,4 +28,34 @@ provider.setCustomParameters({ prompt: 'select_account'});
 export const auth = getAuth();
 const signInWithGoogle = () => signInWithPopup(auth, provider);
 
+const db = getFirestore();
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+  if(!userAuth) return;
+
+  const userRef = doc(db, "users", userAuth.uid);
+  const userSnap = await getDoc(userRef);
+
+  if(!userSnap.exists()) {
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+    
+    try {
+      const userData = {
+        displayName,
+        email,
+        createdAt,
+        ...additionalData
+      }
+      await setDoc(userRef, userData);
+    } catch(error) {
+      console.log("Something went wrong.", error.message);
+    }
+  }
+
+  return userRef;
+}
+
+export const createUserWithEmailAndPasswordF = (email, password) => {
+  return createUserWithEmailAndPassword(auth, email, password);
+}
 export default signInWithGoogle;
