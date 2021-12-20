@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
-import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
 
@@ -26,7 +26,7 @@ const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account'});
 
 export const auth = getAuth();
-const signInWithGoogle = () => signInWithPopup(auth, provider);
+export const signInWithGoogle = () => signInWithPopup(auth, provider);
 
 const db = getFirestore();
 export const createUserProfileDocument = async (userAuth, additionalData) => {
@@ -55,7 +55,10 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   return userRef;
 }
 
-export const createUserWithEmailAndPasswordF = (email, password) => {
+export const createUserWithEmailAndPasswordProxy = (email, password) => {
   return createUserWithEmailAndPassword(auth, email, password);
 }
-export default signInWithGoogle;
+
+export const signInWithEmailAndPasswordProxy = (email, password) => {
+  return signInWithEmailAndPassword(auth, email, password);
+}
